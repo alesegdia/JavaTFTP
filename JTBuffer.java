@@ -15,13 +15,41 @@ public class JTBuffer {
 	offset = 0;
     }
 
-    public addString (String data) {
+    public boolean addString (String data) {
+	byte[] tmpByteArray = data.getBytes("US-ASCII");
+
+	if(data.length() + offset > buffer.length()) {
+	    System.err.println("Buffer overflow because a string.");
+	    return false;
+	} else {
+	    // Encoding is US-ASCII but US-ASCII extended would be
+	    // a bit more compatible and standard. Check this!
+	    byte[] tmpByteArray = data.getBytes("US-ASCII");
+
+	    for(int i = 0; i < tmpByteArray.length(); i++) {
+		buffer[offset] = tmpByteArray[i];
+		offset++;
+	    }
+
+	    return true;
+	}
     }
 
     public String getString () {
+	byte[] tmpByteArray = new byte[512];
+	int i = 0;
+
+	while(buffer[offset] != 0) {
+	    tmpByteArray[i] = buffer[offset];
+
+	    i++;
+	    offset++;
+	}
+
+	return tmpByteArray.toString();
     }
 
-    public addShort (short data) {
+    public boolean addShort (short data) {
     }
 
     public short getShort () {
