@@ -6,8 +6,8 @@ public class ServidorUDPHolaMundo {
 	private DatagramPacket paquete = null;
 	private int TAM_BUFFER = 100;
 	
-	public ServidorUDPHolaMundo(InetAddress host, int puerto) throws SocketException {
-		datagrama = new DatagramSocket(puerto, host);
+	public ServidorUDPHolaMundo(int puerto) throws SocketException {
+		datagrama = new DatagramSocket(puerto);
 	}
 	
 	public void enviarMensaje() throws IOException {
@@ -35,14 +35,14 @@ public class ServidorUDPHolaMundo {
 	public static void main(String args[]) throws UnknownHostException, SocketException, IOException {
 		InetAddress host = null;
 		int puerto = 0;
-		if(args.length != 2) {
+		if(args.length != 1) {
 			System.err.println("Número de parámetros insuficiente");
 			System.exit(-1);
 		}
-		host = InetAddress.getByName(args[0]);
-		puerto = Integer.parseInt(args[1]);
 		
-		ServidorUDPHolaMundo servidor = new ServidorUDPHolaMundo(host, puerto);
+		puerto = Integer.parseInt(args[0]);
+		
+		ServidorUDPHolaMundo servidor = new ServidorUDPHolaMundo(puerto);
 		System.out.println("Mensaje recibido: "+ servidor.recibirMensaje() );
 		servidor.enviarMensaje();
 		servidor.cerrar();
