@@ -7,7 +7,7 @@ public class JTBuffer {
 
     public JTBuffer (int length) {
 	buffer = new byte[length];
-	offset = 0;
+	reset();
     }
     
     public reset () {

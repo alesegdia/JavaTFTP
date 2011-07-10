@@ -1,0 +1,6 @@
+JavaTFTP Developers Documentation
+*********************************
+
+'A' creates a JTBuffer and it's filled with it's relevant information, depending on the OPCODE, with addString and addShort methods given by the propper class. Then, the offset would be set to the end of the buffer. Finally, the buffer us dumpt and sent via UDP to the listener 'B'.
+
+'B' gets the buffer sent by 'A' and add it to a new JTBuffer by the setBuffer method. Now, the offset is set to 0 and the Buffer is read. Finally, we read the data on the buffer with getShort and getString depending on the OPCODE too, and the buffer will be incrementing as we are reading.
