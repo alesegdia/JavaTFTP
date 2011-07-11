@@ -2,12 +2,12 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-public class JTBuffer {
+public class Buffer {
 
     private byte buffer[];
     private short offset;
 
-    public JTBuffer (int length) {
+    public Buffer (int length) {
 	buffer = new byte[length];
 	reset();
     }
