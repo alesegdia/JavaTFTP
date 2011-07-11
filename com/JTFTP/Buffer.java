@@ -1,3 +1,5 @@
+package com.JTFTP;
+
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -68,8 +70,10 @@ public class Buffer {
 	if(offset + 2 > buffer.length) {
 	    status = false;
 	} else {
-	    buffer[offset++] = (byte) ((data & 0xFF00) >> 8);
-	    buffer[offset++] = (byte) (data & 0x00FF);
+	    buffer[offset] = (byte) ((data & 0xFF00) >> 8);
+	    offset++;
+	    buffer[offset] = (byte) (data & 0x00FF);
+	    offset++;
 
 	    status = true;
 	}
@@ -95,4 +99,17 @@ public class Buffer {
 	this.buffer = tempBuff;
     }
 
+    public void printBuffer (int howMuch, boolean toString) {
+	if(howMuch <= buffer.length) {
+	    for (int i = 0; i < howMuch; i++) {
+		if(toString) {
+		    System.out.print(String.valueOf(buffer[i]) + ", ");
+		} else {
+		    System.out.print(buffer[i] + ", ");
+		}
+	    }
+	} else {
+	    System.out.println("Overflow motherfucker!!");
+	}
+    }
 }
