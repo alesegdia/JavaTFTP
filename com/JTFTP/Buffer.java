@@ -19,42 +19,23 @@ public class Buffer {
 	offset = 0;
     }
 
-    public boolean addString (String data) {
+    public void addString (String data) {
 	boolean status;
 	byte[] tmpByteArray;
 
 	try {
 	    tmpByteArray = data.getBytes("US-ASCII");
-	} catch (UnsupportedEncodingException ex) {
-	    tmpByteArray = null;
-	    System.err.println("Unsupported encoding.");
-	}
-	
-	if(tmpByteArray.length + offset > buffer.length) {
-	    System.err.println("Buffer overflow because a string.");
-	    status = false;
-	} else {
-	    // Encoding is US-ASCII but US-ASCII extended would be
-	    // a bit more compatible and standard. Check this!
-	    
+
 	    System.arraycopy(tmpByteArray, 0, buffer, offset, tmpByteArray.length);
-	    
-	    //for(int i = 0; i < tmpByteArray.length; i++) {
-	    //buffer[offset] = tmpByteArray[i];
-	    //offset++;
-	    //}
 
 	    offset += tmpByteArray.length;
-
 	    buffer[offset] = 0;
-	    offset++;
 
-	    status = true;
-	}
-	return status;
+	    offset++;
+	} catch (UnsupportedEncodingException ex) {}
     }
 
-    public String getString () {
+    public String getString () throws UnsupportedEncodingException {
 	byte[] tmpByteArray = new byte[512];
 	int i = 0;
 
@@ -115,5 +96,9 @@ public class Buffer {
 	} else {
 	    System.out.println("Overflow motherfucker!!");
 	}
+    }
+
+    public void copyBuffer (Buffer buff) {
+	buffer = buff.dumpBuffer();
     }
 }
