@@ -1,4 +1,6 @@
-import java.util.Arrays;
+import java.util.*;
+import java.lang.*;
+import java.io.*;
 
 public class JTBuffer {
 
@@ -10,29 +12,40 @@ public class JTBuffer {
 	reset();
     }
     
-    public reset () {
-	Arrays.fill(buffer, 0);
+    public void reset () {
+	Arrays.fill(buffer, (byte) 0);
 	offset = 0;
     }
 
     public boolean addString (String data) {
-	byte[] tmpByteArray = data.getBytes("US-ASCII");
+	boolean status;
+	byte[] tmpByteArray;
 
-	if(data.length() + offset > buffer.length()) {
+	try {
+	    tmpByteArray = data.getBytes("US-ASCII");
+	} catch (UnsupportedEncodingException ex) {
+	    tmpByteArray = null;
+	    System.err.println("Unsupported encoding.");
+	}
+
+	if(data.length() + offset > buffer.length) {
 	    System.err.println("Buffer overflow because a string.");
-	    return false;
+	    status = false;
 	} else {
 	    // Encoding is US-ASCII but US-ASCII extended would be
 	    // a bit more compatible and standard. Check this!
-	    byte[] tmpByteArray = data.getBytes("US-ASCII");
 
-	    for(int i = 0; i < tmpByteArray.length(); i++) {
+	    for(int i = 0; i < tmpByteArray.length; i++) {
 		buffer[offset] = tmpByteArray[i];
 		offset++;
 	    }
 
-	    return true;
+	    buffer[offset] = 0;
+	    offset++;
+
+	    status = true;
 	}
+	return status;
     }
 
     public String getString () {
@@ -50,16 +63,35 @@ public class JTBuffer {
     }
 
     public boolean addShort (short data) {
+	boolean status;
+
+	if(offset + 2 > buffer.length) {
+	    status = false;
+	} else {
+	    buffer[offset++] = (byte) ((data & 0xFF00) >> 8);
+	    buffer[offset++] = (byte) (data & 0x00FF);
+
+	    status = true;
+	}
+
+	return status;
     }
 
     public short getShort () {
+	byte b1 = buffer[offset++];
+	byte b0 = buffer[offset++];
+	
+	short sb1 = (short) b1;
+	short sb0 = (short) b0;
+
+	return (short) (((sb1 << 8)) | sb0); 
     }
 
     public byte[] dumpBuffer () {
 	return buffer;
     }
 
-    public setBuffer (byte[] tempBuff) {
+    public void setBuffer (byte[] tempBuff) {
 	this.buffer = tempBuff;
     }
 
