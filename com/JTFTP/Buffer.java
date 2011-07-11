@@ -15,7 +15,7 @@ public class Buffer {
     }
     
     public void reset () {
-	Arrays.fill(buffer, (byte) 0);
+	Arrays.fill(buffer, (byte)0);
 	offset = 0;
     }
 
@@ -29,18 +29,22 @@ public class Buffer {
 	    tmpByteArray = null;
 	    System.err.println("Unsupported encoding.");
 	}
-
-	if(data.length() + offset > buffer.length) {
+	
+	if(tmpByteArray.length + offset > buffer.length) {
 	    System.err.println("Buffer overflow because a string.");
 	    status = false;
 	} else {
 	    // Encoding is US-ASCII but US-ASCII extended would be
 	    // a bit more compatible and standard. Check this!
+	    
+	    System.arraycopy(tmpByteArray, 0, buffer, offset, tmpByteArray.length);
+	    
+	    //for(int i = 0; i < tmpByteArray.length; i++) {
+	    //buffer[offset] = tmpByteArray[i];
+	    //offset++;
+	    //}
 
-	    for(int i = 0; i < tmpByteArray.length; i++) {
-		buffer[offset] = tmpByteArray[i];
-		offset++;
-	    }
+	    offset += tmpByteArray.length;
 
 	    buffer[offset] = 0;
 	    offset++;
@@ -61,7 +65,7 @@ public class Buffer {
 	    offset++;
 	}
 
-	return tmpByteArray.toString();
+	return new String(tmpByteArray, "US-ASCII");
     }
 
     public boolean addShort (short data) {
