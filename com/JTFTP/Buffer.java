@@ -19,20 +19,18 @@ public class Buffer {
 	offset = 0;
     }
 
-    public void addString (String data) {
+    public void addString (String data) throws UnsupportedEncodingException {
 	boolean status;
 	byte[] tmpByteArray;
 
-	try {
-	    tmpByteArray = data.getBytes("US-ASCII");
+	tmpByteArray = data.getBytes("US-ASCII");
 
-	    System.arraycopy(tmpByteArray, 0, buffer, offset, tmpByteArray.length);
+	System.arraycopy(tmpByteArray, 0, buffer, offset, tmpByteArray.length);
 
-	    offset += tmpByteArray.length;
-	    buffer[offset] = 0;
+	offset += tmpByteArray.length;
+	buffer[offset] = 0;
 
-	    offset++;
-	} catch (UnsupportedEncodingException ex) {}
+	offset++;
     }
 
     public String getString () throws UnsupportedEncodingException {
