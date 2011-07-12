@@ -14,14 +14,14 @@ public class Server {
 	datagram = new DatagramSocket(port);
     }
 
-    public void sendPacket(byte[] data) throws IOException {
+    private void sendPacket(byte[] data) throws IOException {
 	DatagramPacket dataPacket = new DatagramPacket(data, data.length,
 						       clientHost, clientPort);
 	
 	datagram.send(dataPacket);
     }
 
-    public void rcvPacket() throws IOException {
+    private void rcvPacket() throws IOException {
 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
 	int opcode;
 
@@ -39,5 +39,29 @@ public class Server {
 	    break;
 	}
     }
+
+    private Connection accept() {
+	byte[] tmpBuffer = new byte[BUFFER_SIZE];
+	Buffer dataBuffer;
+
+	DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
+	datagram.receive(dataPacket);
+
+	dataBuffer = new Buffer(dataPacket.getData().length);
+	dataBuffer.setBuffer(dataPacket.getData());
+
+	short opcode = dataBuffer.getShort();
+	String filename = dataBuffer.getString();
+	String mode = dataBuffer.getString();
+
+	if(opcode == (short)1 || opcode == (short)2) {
+	    return new Connection (new TID(dataPacket.getAddress(), dataPacket.getPort()), 
+				   filename, mode);
+	} else {
+	    // No valid connection, throw exception
+	    return null;
+	}
+    }
+
 }
 	
