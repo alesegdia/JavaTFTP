@@ -113,7 +113,7 @@ public class Buffer {
 		}
 	    }
 	} else {
-	    System.out.println("Overflow motherfucker!!");
+	    System.out.println("Overflow!!");
 	}
     }
 }
