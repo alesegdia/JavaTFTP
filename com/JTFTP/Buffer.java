@@ -34,7 +34,7 @@ public class Buffer {
     }
 
     public String getString () throws UnsupportedEncodingException {
-	byte[] tmpByteArray = new byte[512];
+	byte[] tmpByteArray = new byte[buffer.length-offset];
 	int i = 0;
 
 	while(buffer[offset] != 0) {
@@ -50,7 +50,7 @@ public class Buffer {
     public boolean addShort (short data) {
 	boolean status;
 
-	if(offset + 2 > buffer.length) {
+	if(offset + 2 >= buffer.length) {
 	    status = false;
 	} else {
 	    buffer[offset] = (byte) ((data & 0xFF00) >> 8);
