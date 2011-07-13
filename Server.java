@@ -4,8 +4,6 @@ import com.JTFTP.*;
 
 public class Server {
     private DatagramSocket datagram = null;
-    private int clientHost;
-    private int clientPort;
     private static final int BUFFER_SIZE = 512;
     private static final int PORT = 69;
 
@@ -13,23 +11,23 @@ public class Server {
 	datagram = new DatagramSocket(port);
     }
 
-    private void sendPacket(byte[] data) throws IOException {
+    private void sendPacket(byte[] data, Connection myConn) throws IOException {
     	DatagramPacket dataPacket = new DatagramPacket(data, data.length,
-    						       clientHost, clientPort);
+    						       myConn.getInetAddress(), myConn.getPort());
 	
     	datagram.send(dataPacket);
     }
 
-    private void rcvPacket() throws IOException {
-	byte[] tmpBuffer = new byte[BUFFER_SIZE];
-	int opcode;
+    // private void rcvPacket() throws IOException {
+    // 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
+    // 	int opcode;
 
-	DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
-	datagram.receive(dataPacket);
-	Buffer dataBuffer = new Buffer(BUFFER_SIZE);
-	dataBuffer.setBuffer(tmpBuffer);
-	opcode = dataBuffer.getShort();
-    }
+    // 	DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
+    // 	datagram.receive(dataPacket);
+    // 	Buffer dataBuffer = new Buffer(BUFFER_SIZE);
+    // 	dataBuffer.setBuffer(tmpBuffer);
+    // 	opcode = dataBuffer.getShort();
+    // }
 
     private Connection accept() throws IOException, SocketTimeoutException {
 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
@@ -70,7 +68,7 @@ public class Server {
 	    return null;
 	}
     }
-    
+
     public static void main (String args[]) throws SocketException, IOException {
 	try {
 	    Server myServer = new Server(50000);
@@ -80,11 +78,8 @@ public class Server {
 
 		currConn = myServer.accept();
 
-		System.out.println("TIMEOUT!!");
-
-
 		if(currConn != null) {
-		    System.out.println("OK!!");
+		    new Transfer(new DatagramSocket (0));
 		}
 	    }
 	} catch (BindException ex) {

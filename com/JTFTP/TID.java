@@ -10,4 +10,12 @@ public class TID {
 	this.host = host;
 	this.port = port;
     }
+
+    public InetAddress getInetAddress() {
+	return host;
+    }
+
+    public int getPort() {
+	return port;
+    }
 }
