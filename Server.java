@@ -79,7 +79,10 @@ public class Server {
 		currConn = myServer.accept();
 
 		if(currConn != null) {
-		    new Transfer(new DatagramSocket (0));
+		    Transfer newTransfer = new Transfer (new DatagramSocket (0), currConn);
+
+		    Thread newThread = new Thread(newTransfer);
+		    newThread.start();
 		}
 	    }
 	} catch (BindException ex) {
