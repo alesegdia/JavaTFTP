@@ -35,15 +35,27 @@ public class Server {
 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
 	Buffer dataBuffer;
 
+	System.out.println("KABOOM");
+
 	DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
+
+	System.out.println("asdfg");
+
 	datagram.receive(dataPacket);
 
-	dataBuffer = new Buffer(dataPacket.getData().length);
-	dataBuffer.setBuffer(dataPacket.getData());
+	System.out.println("BLEHG");
+
+	dataBuffer = new Buffer(dataPacket.getData());
+
+	System.out.println("HUH");
 
 	short opcode = dataBuffer.getShort();
 	String filename = dataBuffer.getString();
 	String mode = dataBuffer.getString();
+
+	System.out.println("opcode: " + opcode);
+	System.out.println("filename: " + filename);
+	System.out.println("mode" + mode);
 
 	if(opcode == (short)1 || opcode == (short)2) {
 	    boolean rw;
@@ -66,9 +78,12 @@ public class Server {
     public static void main (String args[]) throws SocketException, IOException {
 	try {
 	    Server myServer = new Server(50000);
+	    System.out.println("SAAA");
 	    Connection currConn;
 	    while(true) {
+		System.out.println("WEEE");
 		currConn = myServer.accept();
+		System.out.println("SADAS");
 		if(currConn != null) {
 		    System.out.println("BLEH!!");
 		}

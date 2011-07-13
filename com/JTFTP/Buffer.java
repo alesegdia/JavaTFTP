@@ -13,6 +13,10 @@ public class Buffer {
 	buffer = new byte[length];
 	reset();
     }
+
+    public Buffer (byte[] buffer) {
+	this.buffer = buffer;
+    }
     
     public void reset () {
 	Arrays.fill(buffer, (byte)0);
