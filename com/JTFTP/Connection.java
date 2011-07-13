@@ -1,13 +1,16 @@
+package com.JTFTP;
+
 public class Connection {
     private final static boolean OCTET = true;
-    private final static boolean READ = true;
+    public final static boolean READ = true;
+    public final static boolean WRITE = false;
 
     private TID currTID;
-    private bool rw;
+    private boolean rw;
     private String fileName;
     private String mode;
 
-    public Connection (TID currTID, bool rw, String fileName, String mode) {
+    public Connection (TID currTID, boolean rw, String fileName, String mode) {
 	this.currTID = currTID;
 	this.rw = rw;
 	this.fileName = fileName;

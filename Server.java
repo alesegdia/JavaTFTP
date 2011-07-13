@@ -4,22 +4,21 @@ import com.JTFTP.*;
 
 public class Server {
     private DatagramSocket datagram = null;
-    private int clientHost = null;
-    private int clientPort = null;
-    private final int BUFFER_SIZE = 512;
-    Buffer dataBuffer;
+    private int clientHost;
+    private int clientPort;
+    private static final int BUFFER_SIZE = 512;
+    private static final int PORT = 69;
 
     public Server (int port) throws SocketException {
-	dataBuffer = new Buffer(BUFFER_SIZE);
 	datagram = new DatagramSocket(port);
     }
 
-    private void sendPacket(byte[] data) throws IOException {
-	DatagramPacket dataPacket = new DatagramPacket(data, data.length,
-						       clientHost, clientPort);
+    // private void sendPacket(byte[] data) throws IOException {
+    // 	DatagramPacket dataPacket = new DatagramPacket(data, data.length,
+    // 						       clientHost, clientPort);
 	
-	datagram.send(dataPacket);
-    }
+    // 	datagram.send(dataPacket);
+    // }
 
     private void rcvPacket() throws IOException {
 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
@@ -27,20 +26,12 @@ public class Server {
 
 	DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
 	datagram.receive(dataPacket);
-	
+	Buffer dataBuffer = new Buffer(BUFFER_SIZE);
 	dataBuffer.setBuffer(tmpBuffer);
 	opcode = dataBuffer.getShort();
-
-	switch(opcode) {
-	case 1:
-	    // etc.
-	    break;
-	default:
-	    break;
-	}
     }
 
-    private Connection accept() {
+    private Connection accept() throws IOException {
 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
 	Buffer dataBuffer;
 
@@ -55,13 +46,36 @@ public class Server {
 	String mode = dataBuffer.getString();
 
 	if(opcode == (short)1 || opcode == (short)2) {
-	    return new Connection (new TID(dataPacket.getAddress(), dataPacket.getPort()), 
-				   filename, mode);
+	    boolean rw;
+
+	    if(opcode == 1) {
+		rw = Connection.READ;
+	    } else {
+		rw = Connection.WRITE;
+	    }
+
+	    Connection myConn = new Connection (new TID(dataPacket.getAddress(), dataPacket.getPort()), 
+						rw, filename, mode);
+	    return myConn;
 	} else {
 	    // No valid connection, throw exception
 	    return null;
 	}
     }
-
+    
+    public static void main (String args[]) throws SocketException, IOException {
+	try {
+	    Server myServer = new Server(50000);
+	    Connection currConn;
+	    while(true) {
+		currConn = myServer.accept();
+		if(currConn != null) {
+		    System.out.println("BLEH!!");
+		}
+	    }
+	} catch (BindException ex) {
+	    System.err.println("Couldn't connect to " + PORT + " port.");
+	}
+    }
 }
 	
