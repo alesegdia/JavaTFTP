@@ -13,12 +13,12 @@ public class Server {
 	datagram = new DatagramSocket(port);
     }
 
-    // private void sendPacket(byte[] data) throws IOException {
-    // 	DatagramPacket dataPacket = new DatagramPacket(data, data.length,
-    // 						       clientHost, clientPort);
+    private void sendPacket(byte[] data) throws IOException {
+    	DatagramPacket dataPacket = new DatagramPacket(data, data.length,
+    						       clientHost, clientPort);
 	
-    // 	datagram.send(dataPacket);
-    // }
+    	datagram.send(dataPacket);
+    }
 
     private void rcvPacket() throws IOException {
 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
@@ -31,13 +31,17 @@ public class Server {
 	opcode = dataBuffer.getShort();
     }
 
-    private Connection accept() throws IOException {
+    private Connection accept() throws IOException, SocketTimeoutException {
 	byte[] tmpBuffer = new byte[BUFFER_SIZE];
 	Buffer dataBuffer;
 
 	DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
 
-	datagram.receive(dataPacket);
+	try {
+	    datagram.receive(dataPacket);
+	} catch (SocketTimeoutException ex) {
+	    System.out.println("TIMEOUT!");
+	}
 
 	dataBuffer = new Buffer(dataPacket.getData());
 
@@ -75,6 +79,9 @@ public class Server {
 	    while(true) {
 
 		currConn = myServer.accept();
+
+		System.out.println("TIMEOUT!!");
+
 
 		if(currConn != null) {
 		    System.out.println("OK!!");

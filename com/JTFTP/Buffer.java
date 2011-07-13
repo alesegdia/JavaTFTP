@@ -48,6 +48,8 @@ public class Buffer {
 	    offset++;
 	}
 
+	offset++;
+
 	return new String(tmpByteArray, "US-ASCII");
     }
 
