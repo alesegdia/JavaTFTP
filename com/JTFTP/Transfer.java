@@ -24,6 +24,7 @@ public class Transfer implements Runnable {
     }
 
     public void run () {
+	
 	while(true) {
 	    // Some code here
 	    if(clientConnection.getRw() == true) {
