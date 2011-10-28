@@ -1,8 +1,6 @@
 package com.JTFTP;
 
-import java.lang.*;
 import java.net.*;
-import com.JTFTP.*;
 
 /*
   Maybe change clientConnection by remoteConnection.
