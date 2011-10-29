@@ -1,0 +1,22 @@
+<project name="JTFTP" default="compile" basedir=".">
+	<property name="name" value="JTFTP"/>
+	<property name="src" value="src"/>
+	<property name="build" value="build"/>
+	<property name="dist"  value="dist"/>
+
+	<target name="compile">
+		<delete file="${dist}/${name}.jar"/>
+		<copy todir="${build}">
+			<fileset dir ="${src}" defaultexcludes="yes">
+				<include name="com/JTFTP/**.java" />
+			</fileset>
+		</copy>
+		<javac srcdir="${src}" destdir="${build}" nowarn="off" optimize="on" deprecation="on" debug="on" includeAntRuntime="yes">
+			<src path="${src}"/>
+		</javac>
+		<jar destfile="${dist}/${name}.jar" basedir="${build}" manifest="${src}/MANIFEST.MF" />
+		<delete includeemptydirs="true">
+			<fileset dir="${build}" includes="*"/>
+		</delete>
+	</target>
+</project>
