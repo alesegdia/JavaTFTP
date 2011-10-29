@@ -1,5 +1,0 @@
-public class Transfer implements Runnable {
-    public void run () {
-	
-    }
-}
