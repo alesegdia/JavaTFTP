@@ -1,5 +1,4 @@
 import com.JTFTP.Buffer;
-import java.lang.*;
 import java.io.*;
 
 public class BufferTest {

@@ -1,6 +1,5 @@
 import java.net.*;
 import java.io.*;
-import com.JTFTP.*;
 
 public class Server {
     private DatagramSocket datagram = null;
