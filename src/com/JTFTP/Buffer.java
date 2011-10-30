@@ -9,7 +9,7 @@ import java.io.*;
 public class Buffer {
 
 	private byte buffer[];
-	private short offset;
+	private int offset;
 
 	/**
 	 * Creates an empty buffer with length bytes capacity (including separators of strings).
