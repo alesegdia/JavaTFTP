@@ -12,23 +12,31 @@ import java.net.*;
 */
 
 public class Transfer implements Runnable {
-    private Thread t;
-    private DatagramSocket datagram = null;
-    private Connection clientConnection;
+	private Thread t;
+	private DatagramSocket datagram = null;
+	private Connection clientConnection;
 
-    public Transfer (DatagramSocket datagram, Connection clientConnection) {
-	this.datagram = datagram;
-	this.clientConnection = clientConnection;
-    }
-
-    public void run () {
-	
-	while(true) {
-	    // Some code here
-	    if(clientConnection.getRw() == true) {
-
-		// Send first piece of code
-	    }
+	/**
+	 *
+	 * @param datagram
+	 * @param clientConnection
+	 */
+	public Transfer(DatagramSocket datagram, Connection clientConnection) {
+		this.datagram = datagram;
+		this.clientConnection = clientConnection;
 	}
-    }
+
+	/**
+	 *
+	 */
+	public void run() {
+
+		while(true) {
+			// Some code here
+			if(clientConnection.getRw() == true) {
+
+				// Send first piece of code
+			}
+		}
+	}
 }

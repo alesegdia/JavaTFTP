@@ -76,7 +76,7 @@ public class Buffer {
 		}
 
 		if(tmpOffset == buffer.length) {
-			throws new ArrayIndexOutOfBoundsException("There is no string to read in this buffer.");
+			throw new ArrayIndexOutOfBoundsException("There is no string to read in this buffer.");
 		}
 
 		offset = tmpOffset + 1;
