@@ -4,7 +4,7 @@ import java.net.*;
 import java.io.*;
 
 /**
- *
+ * This class wait new connections of TFTP clients and response it petitions.
  */
 public class Server {
 	private DatagramSocket datagram = null;
@@ -12,19 +12,19 @@ public class Server {
 	private static final int PORT = 69;
 
 	/**
-	 *
-	 * @param port
-	 * @throws SocketException
+	 * Construct a new server that wait connections at port number port.
+	 * @param port is the number of port at which server wait the new connections.
+	 * @throws SocketException if an error ocurred during the creation of socket.
 	 */
 	public Server (int port) throws SocketException {
 		datagram = new DatagramSocket(port);
 	}
 
 	/**
-	 *
-	 * @param data
-	 * @param myConn
-	 * @throws IOException
+	 * Try to send a packet to the client specified by myConn.
+	 * @param data is the packet to send.
+	 * @param myConn is the representation of the connection with client.
+	 * @throws IOException if an error ocurred while packet is sent.
 	 */
 	private void sendPacket(byte[] data, Connection myConn) throws IOException {
 		DatagramPacket dataPacket = new DatagramPacket(data, data.length,
@@ -45,10 +45,10 @@ public class Server {
 	}*/
 
 	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 * @throws SocketTimeException
+	 * Wait for new connections of TFTP clients.
+	 * @return a representation of the connection with new client.
+	 * @throws IOException if an error ocurred while waiting.
+	 * @throws SocketTimeException if time limit has expired.
 	 */
 	private Connection accept() throws IOException, SocketTimeoutException {
 		byte[] tmpBuffer = new byte[BUFFER_SIZE];
@@ -103,7 +103,7 @@ public class Server {
 				currConn = myServer.accept();
 
 				if(currConn != null) {
-					Transfer newTransfer = new Transfer (new DatagramSocket (0), currConn);
+					Transfer newTransfer = new Transfer (new DatagramSocket(0), currConn);
 
 					Thread newThread = new Thread(newTransfer);
 					newThread.start();

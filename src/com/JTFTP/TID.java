@@ -3,33 +3,34 @@ package com.JTFTP;
 import java.net.*;
 
 /**
- *
+ * This class represents a transfer identifier of TFTP protocol (see rfc 1350).
  */
 public class TID {
 	private InetAddress host;
 	private int port;
 
 	/**
-	 *
-	 * @param host
-	 * @param port
+	 * Construct a transfer identifier.
+	 * @param host is an address.
+	 * @param port is a port number.
 	 */
 	public TID(InetAddress host, int port) {
 		this.host = host;
+		//see that 0 <= port <= 65535
 		this.port = port;
 	}
 
 	/**
-	 *
-	 * @return 
+	 * Get the address.
+	 * @return the InetAddress.
 	 */
 	public InetAddress getInetAddress() {
 		return host;
 	}
 
 	/**
-	 *
-	 * @return 
+	 * Get the port.
+	 * @return the port number.
 	 */
 	public int getPort() {
 		return port;

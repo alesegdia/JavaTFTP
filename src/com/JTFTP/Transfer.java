@@ -11,23 +11,26 @@ import java.net.*;
   Maybe make this a base class and make two inherited classes for client and server.
 */
 
+/**
+ * This class is the responsable of send/receive a file.
+ */
 public class Transfer implements Runnable {
 	private Thread t;
-	private DatagramSocket datagram = null;
+	private DatagramSocket socket;
 	private Connection clientConnection;
 
 	/**
-	 *
-	 * @param datagram
-	 * @param clientConnection
+	 * Construct a new transfer connection.
+	 * @param socket is the socket used to transfer the file specified in clientConnection.
+	 * @param clientConnection is the representation of connection used to transfer data.
 	 */
-	public Transfer(DatagramSocket datagram, Connection clientConnection) {
-		this.datagram = datagram;
+	public Transfer(DatagramSocket socket, Connection clientConnection) {
+		this.socket = socket;
 		this.clientConnection = clientConnection;
 	}
 
 	/**
-	 *
+	 * Send/receive a file.
 	 */
 	public void run() {
 
