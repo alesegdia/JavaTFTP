@@ -46,7 +46,7 @@ public class Buffer {
 
 		tmpByteArray = data.getBytes("US-ASCII");
 		if(buffer.length < offset + tmpByteArray.length + 1) {
-			throw new ArrayIndexOutOfBoundsException("The string not fit in the buffer.");
+			throw new ArrayIndexOutOfBoundsException("The string doesn't fit in the buffer.");
 		}
 
 		System.arraycopy(tmpByteArray, 0, buffer, offset, tmpByteArray.length);
@@ -69,7 +69,7 @@ public class Buffer {
 		int i = 0;
 
 		while(tmpOffset < buffer.length && buffer[tmpOffset] != 0) {
-			tmpByteArray[i] = buffer[offset];
+			tmpByteArray[i] = buffer[tmpOffset];
 
 			i++;
 			tmpOffset++;
