@@ -1,0 +1,17 @@
+Functionality:
+
+*) Server: send files
+*) Server: receive files
+*) Server: send errors
+
+*) Client: send files
+*) Client: receive files
+*) Client: send errors
+
+Future improvements:
+
+*) Use ByteBuffer (see http://download.oracle.com/javase/6/docs/api/java/nio/ByteBuffer.html ) to simplify or replace Buffer.java
+
+*) Improve the way of parsing (in MainClass) with one of the parsers discussed here: http://stackoverflow.com/questions/367706/is-there-a-good-command-line-argument-parser-for-java
+
+*) Use Enum type (see http://download.oracle.com/javase/tutorial/java/javaOO/enum.html ) to group constants like read/write or octet/ascii/mail
