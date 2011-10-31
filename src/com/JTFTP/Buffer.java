@@ -89,13 +89,13 @@ public class Buffer {
 	 * @param data is the integer to save.
 	 * @throws ArrayIndexOutOfBoundsException if data not fit in the buffer.
 	 */
-	public void addShort(short data) throws ArrayIndexOutOfBoundsException {
+	public void addShort(int data) throws ArrayIndexOutOfBoundsException {
 		if(buffer.length < offset + 2) {
 			throw new ArrayIndexOutOfBoundsException("The short not fit in the buffer.");
 		}
-		buffer[offset] = (byte) ((data & 0xFF00) >> 8);
+		buffer[offset] = (byte) ((data & 0x0000FF00) >> 8);
 		offset++;
-		buffer[offset] = (byte) (data & 0x00FF);
+		buffer[offset] = (byte)  (data & 0x000000FF);
 		offset++;
 	}
 
@@ -104,11 +104,16 @@ public class Buffer {
 	 * @return the next short of the buffer.
 	 * @throws ArrayIndexOutOfBoundsException if there aren't 2 or more bytes to read. 
 	 */
-	public short getShort() throws ArrayIndexOutOfBoundsException {
+	public int getShort() throws ArrayIndexOutOfBoundsException {
 		if(buffer.length < offset + 2) {
 			throw new ArrayIndexOutOfBoundsException("Threre are less than 2 bytes to read and short can't be obtained.");
 		}
-		return (short) (buffer[offset++] << 8 | buffer[offset++]);
+                
+                int tmp = buffer[offset++];
+                tmp = (tmp < 0) ? 256 + tmp : tmp;
+                int tmp2 = buffer[offset++];
+                tmp2 = (tmp2 < 0) ? 256 + tmp2 : tmp2;
+                return tmp << 8 | tmp2;
 	}
 
 	/**
