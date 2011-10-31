@@ -50,7 +50,7 @@ public class Server {
 	 * @throws IOException if an error ocurred while waiting.
 	 * @throws SocketTimeException if time limit has expired.
 	 */
-	private Connection accept() throws IOException, SocketTimeoutException {
+	public Connection accept() throws IOException, SocketTimeoutException {
 		byte[] tmpBuffer = new byte[BUFFER_SIZE];
 		Buffer dataBuffer;
 
@@ -72,7 +72,7 @@ public class Server {
 		System.out.println("filename: " + filename);
 		System.out.println("mode: \"" + mode + "\"");
 
-		if(opcode == (short)1 || opcode == (short)2) {
+		if(opcode == 1 || opcode == 2) {
 			boolean rw;
 
 			if(opcode == 1) {
@@ -87,31 +87,6 @@ public class Server {
 		}
 		// No valid connection, throw exception
 		return null;
-	}
-
-	/*
-	 * This function will be erased soon, and this functionality will be traspassed to MainClass and other
-	 * parts of this class.
-	 */
-	public static void main(String args[]) throws SocketException, IOException {
-		try {
-			Server myServer = new Server(50000);
-
-			Connection currConn;
-			while(true) {
-
-				currConn = myServer.accept();
-
-				if(currConn != null) {
-					Transfer newTransfer = new Transfer (new DatagramSocket(0), currConn);
-
-					Thread newThread = new Thread(newTransfer);
-					newThread.start();
-				}
-			}
-		} catch(BindException ex) {
-			System.err.println("Couldn't connect to " + PORT + " port.");
-		}
 	}
 }
 	
