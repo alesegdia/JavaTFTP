@@ -16,7 +16,7 @@ public class Server {
 	 * @param port is the number of port at which server wait the new connections.
 	 * @throws SocketException if an error ocurred during the creation of socket.
 	 */
-	public Server (int port) throws SocketException {
+	public Server(int port) throws SocketException {
 		datagram = new DatagramSocket(port);
 	}
 
@@ -26,7 +26,7 @@ public class Server {
 	 * @param myConn is the representation of the connection with client.
 	 * @throws IOException if an error ocurred while packet is sent.
 	 */
-	private void sendPacket(byte[] data, Connection myConn) throws IOException {
+	public void sendPacket(byte[] data, Connection myConn) throws IOException {
 		DatagramPacket dataPacket = new DatagramPacket(data, data.length,
 			myConn.getInetAddress(), myConn.getPort());
 
@@ -64,7 +64,7 @@ public class Server {
 
 		dataBuffer = new Buffer(dataPacket.getData());
 
-		short opcode = dataBuffer.getShort();
+		int opcode = dataBuffer.getShort();
 		String filename = dataBuffer.getString();
 		String mode = dataBuffer.getString();
 
