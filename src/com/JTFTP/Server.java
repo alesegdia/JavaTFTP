@@ -10,8 +10,8 @@ public class Server {
 	private DatagramSocket datagram = null;
 	private static final int BUFFER_SIZE = 512;
 	private static final int PORT = 69;
-
-	/**
+	
+	/**	
 	 * Construct a new server that wait connections at port number port.
 	 * @param port is the number of port at which server wait the new connections.
 	 * @throws SocketException if an error ocurred during the creation of socket.
@@ -64,7 +64,7 @@ public class Server {
 
 		dataBuffer = new Buffer(dataPacket.getData());
 
-		short opcode = dataBuffer.getShort();
+		int opcode = dataBuffer.getShort();
 		String filename = dataBuffer.getString();
 		String mode = dataBuffer.getString();
 
