@@ -1,3 +1,5 @@
+package com.JTFTP;
+
 import java.io.*;
 
 /**
@@ -43,7 +45,7 @@ public class FileBlocksReader {
 	 * @return if the last block already was readed.
 	 */
 	public boolean hasNext() {
-		return (index+1)*blockLength > length;
+		return index*blockLength < length;
 	}
 
 	/**
@@ -68,14 +70,13 @@ public class FileBlocksReader {
 			throw new EOFException("Last block was readed.");
 		}
 		long tmp = (index+1)*blockLength - length;
-		int nextBlockLength = (int) ((tmp > 0) ? tmp : blockLength);
+		int nextBlockLength = (int) ((tmp > 0) ? blockLength - tmp : blockLength);
 		if(nextBlockLength > b.length - off) {
 			throw new ArrayIndexOutOfBoundsException("Array b only have "+ 
 				(b.length-off) +" available bytes and block have length " +nextBlockLength);
 		}
-		input.read(b, off, nextBlockLength);
 		index++;
-		return nextBlockLength;
+		return input.read(b, off, nextBlockLength);
 	}
 
 }

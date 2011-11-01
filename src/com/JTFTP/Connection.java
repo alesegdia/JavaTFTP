@@ -35,7 +35,7 @@ public class Connection {
 	 * Get the address of the transfer identifier of this connection.
 	 * @return an InetAddress.
 	 */
-	public InetAddress getInetAddress () {
+	public InetAddress getInetAddress() {
 		return currTID.getInetAddress();
 	}
 
@@ -43,7 +43,7 @@ public class Connection {
 	 * Get the port used of transfer identifier of this connection.
 	 * @return the port.
 	 */
-	public int getPort () {
+	public int getPort() {
 		return currTID.getPort();
 	}
 
@@ -51,7 +51,7 @@ public class Connection {
 	 * Tells if this connection is to read (true) or write (false).
 	 * @return true (read) or false (write).
 	 */
-	public boolean getRw () {
+	public boolean getRw() {
 		return rw;
 	}
 
@@ -59,7 +59,7 @@ public class Connection {
 	 * Get the name of the file to be transfered or received.
 	 * @return the name of a file.
 	 */
-	public String getFileName () {
+	public String getFileName() {
 		return fileName;
 	}
 
@@ -67,7 +67,7 @@ public class Connection {
 	 * Get the mode of connection.
 	 * @return true ("netascii") or flase ("octet").
 	 */
-	public String getMode () {
+	public String getMode() {
 		return mode;
 	}
 }

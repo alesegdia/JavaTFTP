@@ -76,14 +76,10 @@ public class MainClass {
 		try {
 			Server myServer = new Server(port);
 
-			Connection newConnection;
 			while(true) {
-
-				newConnection = myServer.accept();
-
+				Connection newConnection = myServer.accept();
 				if(newConnection != null) {
 					Transfer newTransfer = new Transfer(new DatagramSocket(0), newConnection);
-
 					Thread newThread = new Thread(newTransfer);
 					newThread.start();
 				}
