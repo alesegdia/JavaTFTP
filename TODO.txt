@@ -15,3 +15,5 @@ Future improvements:
 *) Improve the way of parsing (in MainClass) with one of the parsers discussed here: http://stackoverflow.com/questions/367706/is-there-a-good-command-line-argument-parser-for-java
 
 *) Use Enum type (see http://download.oracle.com/javase/tutorial/java/javaOO/enum.html ) to group constants like read/write or octet/ascii/mail
+
+*) Make a graphical user interface (keeping the comand line versión).
