@@ -48,6 +48,14 @@ public class Connection {
 	}
 
 	/**
+	 * Get the transfer identifier of this connection.
+	 * @return the TID.
+	 */
+	public TID getTID() {
+		return currTID;
+	}
+
+	/**
 	 * Tells if this connection is to read (true) or write (false).
 	 * @return true (read) or false (write).
 	 */
@@ -69,5 +77,14 @@ public class Connection {
 	 */
 	public String getMode() {
 		return mode;
+	}
+
+	/**
+	 * Verifies is id is the transfer identifier used by this connection.
+	 * @param id is the transfer identifier to comprove.
+	 * @return true is id is the transfer identifier used by this connection.
+	 */
+	public boolean correctTID(TID id) {
+		return currTID.equals(id);
 	}
 }

@@ -9,7 +9,15 @@ import java.io.*;
 public class Server {
 	private DatagramSocket datagram = null;
 	private static final int BUFFER_SIZE = 512;
-	private static final int PORT = 69;
+	public static final int DEFAULT_PORT = 69;
+
+	/**	
+	 * Construct a new server that wait connections at default port number.
+	 * @throws SocketException if an error ocurred during the creation of socket.
+	 */
+	public Server() throws SocketException {
+		this(DEFAULT_PORT);
+	}
 	
 	/**	
 	 * Construct a new server that wait connections at port number port.

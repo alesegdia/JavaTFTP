@@ -17,3 +17,5 @@ Future improvements:
 *) Use Enum type (see http://download.oracle.com/javase/tutorial/java/javaOO/enum.html ) to group constants like read/write or octet/ascii/mail
 
 *) Make a graphical user interface (keeping the comand line versión).
+
+*) Rename (using git -mv) Server to TFTP_ServerSocket and Transfer to TFTP_Socket or something similar?

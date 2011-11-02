@@ -40,7 +40,7 @@ public class Buffer {
 	 * @throws UnsupportedEncodingException if US-ASCII encoding is not supported.
 	 * @throws ArrayIndexOutOfBoundsException if data not fit in the buffer.
 	 */
-	public void addString(String data) throws UnsupportedEncodingException, ArrayIndexOutOfBoundsException {
+	public int addString(String data) throws UnsupportedEncodingException, ArrayIndexOutOfBoundsException {
 		boolean status;
 		byte[] tmpByteArray;
 
@@ -55,6 +55,17 @@ public class Buffer {
 		buffer[offset] = 0;
 
 		offset++;
+		return tmpByteArray.length+1;
+	}
+
+	/**
+	 * Says the number of bytes that would occupy data plus 1 (the separator).
+	 * @param data is the string whose length representation we want to know.
+	 * @return the number of bytes that would occupy data plus 1 (the separator).
+	 * @throws UnsupportedEncodingException if US-ASCII encoding is not supported.
+	 */
+	public static int length(String data) throws UnsupportedEncodingException {
+		return data.getBytes("US-ASCII").length;
 	}
 
 	/**
@@ -152,5 +163,14 @@ public class Buffer {
 	public void copyBuffer(Buffer buffer) {
 		this.buffer = buffer.dumpBuffer();
 		offset = 0;
+	}
+
+	/**
+	 * Return the offset at which next element will be put which coincides with
+	 * the number of bytes occupied.
+	 * @return the offset.
+	 */
+	public int getOffset() {
+		return offset;
 	}
 }

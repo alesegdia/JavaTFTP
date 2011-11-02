@@ -19,7 +19,7 @@ public class Transfer implements Runnable {
 	private Thread t;
 	private DatagramSocket socket;
 	private Connection clientConnection;
-	private static final int BUFFER_SIZE = 512;
+	private static final int BUFFER_SIZE = 1024;
 
 	/**
 	 * Construct a new transfer connection.
@@ -32,15 +32,25 @@ public class Transfer implements Runnable {
 	}
 
 	/**
-	 * Try to send a packet to the client specified by clientConnection.
+	 * Send a packet to the client specified by clientConnection.
 	 * @param data is the packet to send.
 	 * @param length is the length of data to send.
 	 * @throws IOException if an error ocurred while packet is sent.
 	 */
 	public void sendPacket(byte[] data, int length) throws IOException {
-		DatagramPacket dataPacket = new DatagramPacket(data, length,
-			clientConnection.getInetAddress(), clientConnection.getPort());
+		sendPacket(data, length, clientConnection.getTID());
+	}
 
+	/**
+	 * Send a packet to the client specified by address and port.
+	 * @param data is the packet to send.
+	 * @param length is the length of data to send.
+	 * @param id is the transfer identifier of the receiver.
+	 * @throws IOException if an error ocurred while packet is sent.
+	 */
+	public void sendPacket(byte[] data, int length, TID id) throws IOException {
+		DatagramPacket dataPacket = new DatagramPacket(data, length, 
+			id.getInetAddress(), id.getPort());
 		socket.send(dataPacket);
 	}
 
@@ -52,8 +62,17 @@ public class Transfer implements Runnable {
 	private Buffer receivePacket() throws IOException {
 		byte[] tmpBuffer = new byte[BUFFER_SIZE];
 
-		DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
-		socket.receive(dataPacket);
+		do {
+			DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
+			socket.receive(dataPacket);
+			TID id = new TID(dataPacket.getAddress(), dataPacket.getPort());
+			if(!clientConnection.correctTID(id)) {
+				sendError(5, "Unknown transfer ID.", id); //Error code and message specified in rfc 1350.
+				//Fix: avoid infinite loop.
+			}else {
+				break;
+			}
+		} while(true);
 		Buffer dataBuffer = new Buffer(BUFFER_SIZE);
 		dataBuffer.setBuffer(tmpBuffer);
 		return dataBuffer;
@@ -61,47 +80,110 @@ public class Transfer implements Runnable {
 	}
 
 	/**
+	 * Try to send an error to the client specified by clientConnection.
+	 * @param code is the error code.
+	 * @param message is the error message.
+	 * @throws IOException if there are any problem while trying to send error.
+	 */
+	private void sendError(int code, String message) throws IOException { //ignore this exception?
+		sendError(code, message, clientConnection.getTID());
+	}
+
+	/**
+	 * Try to send an error to the client specified by id.
+	 * @param code is the error code.
+	 * @param message is the error message.
+	 * @param id is the transfer identifier of the receiver.
+	 * @throws IOException if there are any problem while trying to send error.
+	 */
+	private void sendError(int code, String message, TID id) throws IOException { //ignore this exception?
+		int length = Buffer.length(message) + 4;
+		Buffer buffer = new Buffer(length);
+		buffer.addShort(5); //add opcode ERROR
+		buffer.addShort(code);
+		buffer.addString(message);
+		sendPacket(buffer.dumpBuffer(), length, id);
+	}
+
+	/**
+	 * Return a buffer with the content of the next block (including opcode and index)
+	 * @param reader 
+	 * @return the next block ready for send.
+	 * @throws IOException if an error ocurred while reading.
+	 */
+	private Buffer nextBlock(FileBlocksReader reader) throws IOException {
+		Buffer buffer = new Buffer(516);
+		buffer.addShort(3); //add opcode DATA
+		buffer.addShort(reader.nextIndex()+1); //add block number
+		reader.read(buffer.dumpBuffer(), 4); //add data
+		return buffer;
+	}
+
+	/**
+	 * Wait the next ack.
+	 * @param expected is the index of the next ack expected.
+	 * @return boolean if the ack expected is received and false in another case.
+	 * @throws IOException if an error ocurred while waiting.
+	 */
+	private boolean receiveAck(int expected) throws IOException {
+		Buffer buffer = receivePacket();
+		int opcode = buffer.getShort();
+		if(opcode == 4) {
+			int blockNumber = buffer.getShort();
+			if(blockNumber == expected) {
+				System.out.println("ACK: " +blockNumber);
+				return true;
+			}
+			if(blockNumber == expected - 1) {
+				System.out.println("the latest has not reached"); //send the last block dispatched.
+			} else {
+				System.out.println("unexpected number of ack, expected "+ 
+					expected +" but received "+ blockNumber);
+				//exit, throw an error, continue?
+			}
+		}else if(opcode >= 1 && opcode <= 5) {
+			sendError(0, "Expected ACK but received "+opcode); //In this case error code is 0 or 4?
+			//exit, throw an error, continue?
+		}else {
+			sendError(4, "Illegal TFTP operation.");
+			//exit, throw an error, continue?
+		}
+		return false;
+	}
+
+	/**
+	 * Send a file to a transfer id, all of this specified in clientConnection.
+	 */
+	private void sendFile() {
+		FileBlocksReader reader = null;
+		try {
+			reader = new FileBlocksReader(clientConnection.getFileName(), 512);
+			while(reader.hasNext()) {
+				Buffer buffer = nextBlock(reader);
+				do {
+					sendPacket(buffer.dumpBuffer(), buffer.getOffset());
+				} while(!receiveAck(reader.nextIndex())); //Fix: avoid infinite loop.
+			}
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}finally {
+			try {
+				if(reader != null) {
+					reader.close();
+				}
+			}catch(IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+
+	/**
 	 * Send/receive a file.
 	 */
-	public void run() {
+	public void run() { //change exceptions for RuntimeException or Error to can throw them.
 
 		if(clientConnection.getRw() == true) {
-			FileBlocksReader reader = null;
-			try {
-				reader = new FileBlocksReader(clientConnection.getFileName(), 512);
-				Buffer buffer;
-				while(reader.hasNext()) {
-					buffer = new Buffer(516);
-					buffer.addShort(3); //add opcode DATA
-					buffer.addShort(reader.nextIndex()+1); //add block number
-					int length = reader.read(buffer.dumpBuffer(), 4); //add data
-					sendPacket(buffer.dumpBuffer(), length+4);
-
-					buffer = receivePacket();
-					int opcode = buffer.getShort();
-					switch(opcode) {
-						case 4: //ACK
-							int blockNumber = buffer.getShort();
-							if(blockNumber == reader.nextIndex()) {
-								System.out.println("ACK: " +blockNumber);
-							}else {
-								System.out.println("unexpected number of ack, expected "+ 
-									reader.nextIndex() +" but received "+ blockNumber);
-							}
-							break;
-					}
-				}
-			}catch(Exception e) {
-				System.out.println(e.getMessage());
-			}finally {
-				try {
-					if(reader != null) {
-						reader.close();
-					}
-				}catch(IOException e) {
-					System.out.println(e.getMessage());
-				}
-			}
+			sendFile();
 		}
 	}
 }
