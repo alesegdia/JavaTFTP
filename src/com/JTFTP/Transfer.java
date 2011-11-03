@@ -107,7 +107,7 @@ public class Transfer implements Runnable {
 
 	/**
 	 * Return a buffer with the content of the next block (including opcode and index)
-	 * @param reader 
+	 * @param reader is the object that reads the blocks from a file.
 	 * @return the next block ready for send.
 	 * @throws IOException if an error ocurred while reading.
 	 */
@@ -115,7 +115,9 @@ public class Transfer implements Runnable {
 		Buffer buffer = new Buffer(516);
 		buffer.addShort(3); //add opcode DATA
 		buffer.addShort(reader.nextIndex()+1); //add block number
-		reader.read(buffer.dumpBuffer(), 4); //add data
+		byte b[] = new byte[512];
+		int length = reader.read(b, 0); 
+		buffer.addBlock(b, length);//add data
 		return buffer;
 	}
 

@@ -35,4 +35,13 @@ public class TID {
 	public int getPort() {
 		return port;
 	}
+
+	/**
+	 * Says if id is the same transfer identifier that this.
+	 * @param id is a transfer identifier.
+	 * @return if id is the same transfer identifier that this.
+	 */
+	public boolean equals(TID id) {
+		return host.equals(id.getInetAddress()) && port == id.getPort();
+	}
 }

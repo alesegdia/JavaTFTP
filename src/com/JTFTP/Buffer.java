@@ -46,7 +46,7 @@ public class Buffer {
 
 		tmpByteArray = data.getBytes("US-ASCII");
 		if(buffer.length < offset + tmpByteArray.length + 1) {
-			throw new ArrayIndexOutOfBoundsException("The string doesn't fit in the buffer.");
+			throw new ArrayIndexOutOfBoundsException("The string \""+data+"\" doesn't fit in the buffer.");
 		}
 
 		System.arraycopy(tmpByteArray, 0, buffer, offset, tmpByteArray.length);
@@ -65,7 +65,7 @@ public class Buffer {
 	 * @throws UnsupportedEncodingException if US-ASCII encoding is not supported.
 	 */
 	public static int length(String data) throws UnsupportedEncodingException {
-		return data.getBytes("US-ASCII").length;
+		return data.getBytes("US-ASCII").length+1;
 	}
 
 	/**
@@ -154,6 +154,30 @@ public class Buffer {
 		for (int i = 0; i < bytesToPrint; i++) {
 			System.out.print(buffer[i] + ", ");
 		}
+	}
+
+	public void addBlock(byte b[], int length) throws ArrayIndexOutOfBoundsException {
+		if(buffer.length < length + offset) {
+			throw new ArrayIndexOutOfBoundsException("Buffer don't have " +length +" bytes available");
+		}else if(length <= 0) {
+			throw new ArrayIndexOutOfBoundsException("Recevied length "+length+" but length can't be negative or zero.");
+		}else if(length > b.length) {
+			throw new ArrayIndexOutOfBoundsException("Recevied length "+length+" is bigger than b length "+ b.length);
+		}
+		System.arraycopy(b, 0, buffer, offset, length);
+		offset += length;
+	}
+
+	public byte[] getBlock(int size) throws ArrayIndexOutOfBoundsException {
+		if(buffer.length < size + offset) {
+			throw new ArrayIndexOutOfBoundsException("Buffer don't have " +length +" bytes.");
+		}else if(size <= 0) {
+			throw new ArrayIndexOutOfBoundsException("Recevied size "+size+" but size can't be negative or zero.");
+		}
+		byte b[] = new byte[size];
+		System.arraycopy(buffer, offset, b, 0, size);
+		offset += size;
+		return b;
 	}
 
 	/**
