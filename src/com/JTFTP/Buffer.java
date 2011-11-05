@@ -4,7 +4,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * This class provides a fixed length buffer in which we can save short's and strings.
+ * This class provides a buffer in which we can save short's, strings and blocks of bytes.
  */
 public class Buffer {
 
@@ -156,6 +156,12 @@ public class Buffer {
 		}
 	}
 
+	/**
+	 * Add length bytes of the block b to the buffer.
+	 * @param b is the block of bytes.
+	 * @param length is the quantity of bytes to add.
+	 * @throws ArrayIndexOutOfBoundsException if there are any problem with length.
+	 */
 	public void addBlock(byte b[], int length) throws ArrayIndexOutOfBoundsException {
 		if(buffer.length < length + offset) {
 			throw new ArrayIndexOutOfBoundsException("Buffer don't have " +length +" bytes available");
@@ -168,15 +174,20 @@ public class Buffer {
 		offset += length;
 	}
 
-	public byte[] getBlock(int size) throws ArrayIndexOutOfBoundsException {
-		if(buffer.length < size + offset) {
+	/**
+	 * Get a block of length bytes of the buffer.
+	 * @param length is the quantity of bytes to get.
+	 * @throws ArrayIndexOutOfBoundsException if there are any problem with length.
+	 */
+	public byte[] getBlock(int length) throws ArrayIndexOutOfBoundsException {
+		if(buffer.length < length + offset) {
 			throw new ArrayIndexOutOfBoundsException("Buffer don't have " +length +" bytes.");
-		}else if(size <= 0) {
-			throw new ArrayIndexOutOfBoundsException("Recevied size "+size+" but size can't be negative or zero.");
+		}else if(length <= 0) {
+			throw new ArrayIndexOutOfBoundsException("Recevied size "+length+" but size can't be negative or zero.");
 		}
-		byte b[] = new byte[size];
-		System.arraycopy(buffer, offset, b, 0, size);
-		offset += size;
+		byte b[] = new byte[length];
+		System.arraycopy(buffer, offset, b, 0, length);
+		offset += length;
 		return b;
 	}
 
@@ -196,5 +207,33 @@ public class Buffer {
 	 */
 	public int getOffset() {
 		return offset;
+	}
+
+	/**
+	 * Resize the buffer to the new length. If length is 0 or less throws an
+	 * IllegalArgumentException
+	 */
+	public void setLength(int length) {
+		if(length <= 0) {
+			throw new IllegalArgumentException("length can't be 0 or less");
+		}
+		if(length < buffer.length) {
+			byte[] tmp = new byte[length];
+			System.arraycopy(buffer, 0, tmp, 0, tmp.length);
+			offset = (length < offset) ? length : offset;
+			buffer = tmp;
+		}else if(length > buffer.length) {
+			byte[] tmp = new byte[length];
+			System.arraycopy(buffer, 0, tmp, 0, buffer.length);
+			buffer = tmp;
+		}
+	}
+
+	/**
+	 * Return the length of the buffer.
+	 * @return the length of the buffer.
+	 */
+	public int getLength() {
+		return buffer.length;
 	}
 }

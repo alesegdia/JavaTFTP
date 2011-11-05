@@ -37,7 +37,7 @@ public class Transfer implements Runnable {
 	 * @param length is the length of data to send.
 	 * @throws IOException if an error ocurred while packet is sent.
 	 */
-	public void sendPacket(byte[] data, int length) throws IOException {
+	private void sendPacket(byte[] data, int length) throws IOException {
 		sendPacket(data, length, clientConnection.getTID());
 	}
 
@@ -48,7 +48,7 @@ public class Transfer implements Runnable {
 	 * @param id is the transfer identifier of the receiver.
 	 * @throws IOException if an error ocurred while packet is sent.
 	 */
-	public void sendPacket(byte[] data, int length, TID id) throws IOException {
+	private void sendPacket(byte[] data, int length, TID id) throws IOException {
 		DatagramPacket dataPacket = new DatagramPacket(data, length, 
 			id.getInetAddress(), id.getPort());
 		socket.send(dataPacket);
@@ -61,10 +61,11 @@ public class Transfer implements Runnable {
 	 */
 	private Buffer receivePacket() throws IOException {
 		byte[] tmpBuffer = new byte[BUFFER_SIZE];
-
+		int length;
 		do {
 			DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
 			socket.receive(dataPacket);
+			length = dataPacket.getLength();
 			TID id = new TID(dataPacket.getAddress(), dataPacket.getPort());
 			if(!clientConnection.correctTID(id)) {
 				sendError(5, "Unknown transfer ID.", id); //Error code and message specified in rfc 1350.
@@ -73,8 +74,8 @@ public class Transfer implements Runnable {
 				break;
 			}
 		} while(true);
-		Buffer dataBuffer = new Buffer(BUFFER_SIZE);
-		dataBuffer.setBuffer(tmpBuffer);
+		Buffer dataBuffer = new Buffer(length);
+		dataBuffer.addBlock(tmpBuffer, length);
 		return dataBuffer;
 		
 	}
@@ -180,12 +181,86 @@ public class Transfer implements Runnable {
 	}
 
 	/**
+	 * Receive the next block of data.
+	 * @param expected is the number of the next block of data expected.
+	 * @throws IOException if an error occurs.
+	 */
+	private byte[] receiveData(int expected) throws IOException {
+		Buffer buffer = receivePacket();
+		int opcode = buffer.getShort();
+		if(opcode == 3) {
+			int blockNumber = buffer.getShort();
+			if(blockNumber == expected) {
+				System.out.println("block number: " +blockNumber);
+				return buffer.getBlock(buffer.getLength() - buffer.getOffset()); //buffer.getLength() - buffer.getOffset() can be bigger than 512?
+			}
+			if(blockNumber == expected - 1) {
+				System.out.println("the latest has not reached"); //send the last block dispatched.
+			} else {
+				System.out.println("unexpected block number, expected "+ 
+					expected +" but received "+ blockNumber);
+				//exit, throw an error, continue?
+			}
+		}else if(opcode >= 1 && opcode <= 5) {
+			sendError(0, "Expected DATA but received "+opcode); //In this case error code is 0 or 4?
+			//exit, throw an error, continue?
+		}else {
+			sendError(4, "Illegal TFTP operation.");
+			//exit, throw an error, continue?
+		}
+		return null;
+		
+	}
+
+	/**
+	 * Send the ack number.
+	 * @throws IOException if an error occurs.
+	 */
+	private void sendAck(int ack) throws IOException {
+		Buffer buffer = new Buffer(4);
+		buffer.addShort(4);
+		buffer.addShort(ack);
+		sendPacket(buffer.dumpBuffer(), 4);
+	}
+
+	/**
+	 * Receive a file from a transfer id, all of this specified in clientConnection.
+	 */
+	private void receiveFile() {
+		FileBlocksWriter writer = null;
+		try {
+			writer = new FileBlocksWriter(clientConnection.getFileName(), true, 512); //overwrite file if exists
+			while(writer.hasNext()) {
+				int blockNumberExpected = writer.nextIndex();
+				byte[] b = receiveData(blockNumberExpected);
+				do {
+					sendAck(blockNumberExpected);
+					b = receiveData(blockNumberExpected);
+				} while(b == null);
+				writer.write(b);
+			}
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}finally {
+			try {
+				if(writer != null) {
+					writer.close();
+				}
+			}catch(IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+
+	/**
 	 * Send/receive a file.
 	 */
 	public void run() { //change exceptions for RuntimeException or Error to can throw them.
 
 		if(clientConnection.getRw() == true) {
 			sendFile();
+		}else {
+			receiveFile();
 		}
 	}
 }

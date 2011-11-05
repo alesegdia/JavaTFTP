@@ -18,4 +18,4 @@ Future improvements:
 
 *) Make a graphical user interface (keeping the comand line versión).
 
-*) Rename (using git -mv) Server to TFTP_ServerSocket and Transfer to TFTP_Socket or something similar?
+*) Rename (using git mv) Server to TFTP_ServerSocket and Transfer to TFTP_Socket or something similar?
