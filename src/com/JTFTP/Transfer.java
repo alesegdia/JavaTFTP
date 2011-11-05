@@ -61,7 +61,7 @@ public class Transfer implements Runnable {
 	 */
 	private Buffer receivePacket() throws IOException {
 		byte[] tmpBuffer = new byte[BUFFER_SIZE];
-		int length;
+		int length = 0;
 		do {
 			DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
 			socket.receive(dataPacket);
@@ -74,8 +74,8 @@ public class Transfer implements Runnable {
 				break;
 			}
 		} while(true);
-		Buffer dataBuffer = new Buffer(length);
-		dataBuffer.addBlock(tmpBuffer, length);
+		Buffer dataBuffer = new Buffer(tmpBuffer);
+		dataBuffer.setLength(length);
 		return dataBuffer;
 		
 	}
@@ -230,12 +230,13 @@ public class Transfer implements Runnable {
 		FileBlocksWriter writer = null;
 		try {
 			writer = new FileBlocksWriter(clientConnection.getFileName(), true, 512); //overwrite file if exists
+			sendAck(0);
 			while(writer.hasNext()) {
-				int blockNumberExpected = writer.nextIndex();
-				byte[] b = receiveData(blockNumberExpected);
+				int blockNumberExpected = writer.nextIndex()+1;
+				byte[] b;
 				do {
-					sendAck(blockNumberExpected);
 					b = receiveData(blockNumberExpected);
+					sendAck(blockNumberExpected);
 				} while(b == null);
 				writer.write(b);
 			}

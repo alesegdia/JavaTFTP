@@ -18,13 +18,20 @@ public class FileBlocksWriter {
 	 * @param blockLength is the length of blocks
 	 * @throws FileFoundException if file exists and overwrite is false.
 	 * @throws FileNotFoundException if file cannot be opened for any reason.
-	 * @throws SecurityException if can write to file specified in filename.
+	 * @throws SecurityException if can write or create file specified in filename.
 	 */
 	public FileBlocksWriter(String filename, boolean overwrite, int blockLength) throws FileFoundException, FileNotFoundException, SecurityException {
 		File file = new File(filename);
 		
 		if(file.exists() && !overwrite) {
 			throw new FileFoundException("File " + filename + "already exists.");
+		}
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+			}catch(IOException e) {
+				throw new SecurityException("Can create file " + filename);
+			}
 		}
 		if(!file.canWrite()) {
 			throw new SecurityException("Can write to file " + filename);
@@ -48,7 +55,7 @@ public class FileBlocksWriter {
 	 * @return if the last block already was writted.
 	 */
 	public boolean hasNext() {
-		return end;
+		return !end;
 	}
 
 	/**
