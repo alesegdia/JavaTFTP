@@ -30,11 +30,11 @@ public class FileBlocksWriter {
 			try {
 				file.createNewFile();
 			}catch(IOException e) {
-				throw new SecurityException("Can create file " + filename);
+				throw new SecurityException("Can't create file " + filename);
 			}
 		}
 		if(!file.canWrite()) {
-			throw new SecurityException("Can write to file " + filename);
+			throw new SecurityException("Can't write to file " + filename);
 		}
 		this.blockLength = blockLength;
 		index = 0;
