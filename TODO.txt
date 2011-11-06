@@ -2,11 +2,17 @@ Functionality:
 
 *) Server: send files
 *) Server: receive files
-*) Server: send errors
 
 *) Client: send files
 *) Client: receive files
-*) Client: send errors
+
+*) Implement timeouts and resend
+*) Errors: capture, send and properly finish reporting the error.
+
+Test:
+
+*) Make unitary test?
+*) Do cross-validation with other TFTP program
 
 Future improvements:
 
@@ -19,3 +25,5 @@ Future improvements:
 *) Make a graphical user interface (keeping the comand line versión).
 
 *) Rename (using git mv) Server to TFTP_ServerSocket and Transfer to TFTP_Socket or something similar?
+
+*) Implement TFTP extensions: see Timeout_TransferSize_Options.txt (rfc 1784) and Option_Extension.txt (rfc 1782). Transfer size option is equivalent to blocksize option of Blocksize_Option.txt (rfc 1783)?

@@ -20,6 +20,7 @@ public class Transfer implements Runnable {
 	private DatagramSocket socket;
 	private Connection clientConnection;
 	private static final int BUFFER_SIZE = 1024;
+	private static final int DEFAULT_TIMEOUT = 5000;
 
 	/**
 	 * Construct a new transfer connection.
@@ -28,6 +29,7 @@ public class Transfer implements Runnable {
 	 */
 	public Transfer(DatagramSocket socket, Connection clientConnection) {
 		this.socket = socket;
+		socket.setSoTimeout(DEFAULT_TIMEOUT);
 		this.clientConnection = clientConnection;
 	}
 
