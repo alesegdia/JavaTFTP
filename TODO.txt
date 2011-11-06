@@ -1,18 +1,28 @@
 Functionality:
 
-*) Server: send files
-*) Server: receive files
+*) Server: send files (started)
+*) Server: receive files (started)
 
 *) Client: send files
 *) Client: receive files
 
-*) Implement timeouts and resend
-*) Errors: capture, send and properly finish reporting the error.
+*) Implement timeouts and resend (started)
+*) Errors: capture, send and properly finish reporting the error. (started)
 
 Test:
 
 *) Make unitary test?
 *) Do cross-validation with other TFTP program
+
+Doubts:
+
+*) What happen with timeout and counter of resends if a packet with incorrect transfer identifier is received?. TFTP can avoid DoS attacks?.
+*) We should ignore data blocks with block number equal to block number expected minus 1 and only resend packet when timeout ocurrs?. This is to avoid resend packets when our timeout occurs and when the time out of other application occurs (remember that this two timeouts are the same and this resends could happen in small time interval).
+
+Documentation
+ 
+*) Do a FAQ with the doubts and other questions?
+*) Do a flux diagram of the server and client?
 
 Future improvements:
 
@@ -27,3 +37,5 @@ Future improvements:
 *) Rename (using git mv) Server to TFTP_ServerSocket and Transfer to TFTP_Socket or something similar?
 
 *) Implement TFTP extensions: see Timeout_TransferSize_Options.txt (rfc 1784) and Option_Extension.txt (rfc 1782). Transfer size option is equivalent to blocksize option of Blocksize_Option.txt (rfc 1783)?
+
+*) Divide big files in parts and send it separatelly?

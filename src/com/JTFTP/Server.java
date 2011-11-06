@@ -32,9 +32,9 @@ public class Server {
 	 * Wait for new connections of TFTP clients.
 	 * @return a representation of the connection with new client.
 	 * @throws IOException if an error ocurred while waiting.
-	 * @throws SocketTimeException if time limit has expired.
+	 * @throws SocketException if a problem ocurrs setting timeout.
 	 */
-	public Connection accept() throws IOException, SocketTimeoutException {
+	public Connection accept() throws IOException, SocketException {
 		byte[] tmpBuffer = new byte[BUFFER_SIZE];
 		Buffer dataBuffer;
 

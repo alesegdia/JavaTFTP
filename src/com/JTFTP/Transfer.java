@@ -16,20 +16,25 @@ import java.io.*;
  * This class is the responsable of send/receive a file.
  */
 public class Transfer implements Runnable {
+	private static final int BUFFER_SIZE = 1024;
+	public static final int DEFAULT_TIMEOUT = 5000;
+	public static final int DEFAULT_MAX_SENDS = 5;
+
 	private Thread t;
 	private DatagramSocket socket;
 	private Connection clientConnection;
-	private static final int BUFFER_SIZE = 1024;
-	private static final int DEFAULT_TIMEOUT = 5000;
+	private int maxSends;
 
 	/**
 	 * Construct a new transfer connection.
 	 * @param socket is the socket used to transfer the file specified in clientConnection.
 	 * @param clientConnection is the representation of connection used to transfer data.
+	 * @param SocketException if a problem ocurrs setting timeout.
 	 */
-	public Transfer(DatagramSocket socket, Connection clientConnection) {
+	public Transfer(DatagramSocket socket, Connection clientConnection) throws SocketException {
 		this.socket = socket;
 		socket.setSoTimeout(DEFAULT_TIMEOUT);
+		maxSends = DEFAULT_MAX_SENDS;
 		this.clientConnection = clientConnection;
 	}
 
@@ -60,8 +65,9 @@ public class Transfer implements Runnable {
 	 * Receive a new packet send by client.
 	 * @return a buffer with the data send by client.
 	 * @throws IOException if an error ocurred while waiting packet receive.
+	 * @throws SocketTimeoutException if timeout expires.
 	 */
-	private Buffer receivePacket() throws IOException {
+	private Buffer receivePacket() throws IOException, SocketTimeoutException {
 		byte[] tmpBuffer = new byte[BUFFER_SIZE];
 		int length = 0;
 		do {
@@ -131,7 +137,12 @@ public class Transfer implements Runnable {
 	 * @throws IOException if an error ocurred while waiting.
 	 */
 	private boolean receiveAck(int expected) throws IOException {
-		Buffer buffer = receivePacket();
+		Buffer buffer = null;
+		try {
+			buffer = receivePacket();
+		}catch(SocketTimeoutException e) {
+			return false;
+		}
 		int opcode = buffer.getShort();
 		if(opcode == 4) {
 			int blockNumber = buffer.getShort();
@@ -165,9 +176,18 @@ public class Transfer implements Runnable {
 			reader = new FileBlocksReader(clientConnection.getFileName(), 512);
 			while(reader.hasNext()) {
 				Buffer buffer = nextBlock(reader);
+				int sendCounter = 0;
 				do {
 					sendPacket(buffer.dumpBuffer(), buffer.getOffset());
-				} while(!receiveAck(reader.nextIndex())); //Fix: avoid infinite loop.
+					if(receiveAck(reader.nextIndex())) {
+						break;
+					}
+					sendCounter++;
+				} while(sendCounter < maxSends);
+				if(sendCounter == maxSends) {
+					sendError(0, "Number of resends exceeded.");
+					//exit, throw an error, return?
+				}
 			}
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
@@ -186,8 +206,9 @@ public class Transfer implements Runnable {
 	 * Receive the next block of data.
 	 * @param expected is the number of the next block of data expected.
 	 * @throws IOException if an error occurs.
+	 * @throws SocketTimeoutException if timeout expires.
 	 */
-	private byte[] receiveData(int expected) throws IOException {
+	private byte[] receiveData(int expected) throws IOException, SocketTimeoutException {
 		Buffer buffer = receivePacket();
 		int opcode = buffer.getShort();
 		if(opcode == 3) {
@@ -235,11 +256,23 @@ public class Transfer implements Runnable {
 			sendAck(0);
 			while(writer.hasNext()) {
 				int blockNumberExpected = writer.nextIndex()+1;
-				byte[] b;
+				byte[] b = null;
+				int sendCounter = 0;
 				do {
-					b = receiveData(blockNumberExpected);
-					sendAck(blockNumberExpected);
-				} while(b == null);
+					try {
+						b = receiveData(blockNumberExpected);
+						if(b != null) {
+							sendAck(blockNumberExpected);
+							break;
+						}
+					}catch(SocketTimeoutException e) {}
+					sendAck(blockNumberExpected-1);
+					sendCounter++;
+				} while(sendCounter < maxSends);
+				if(b == null) {
+					sendError(0, "Number of resends exceeded.");
+					//exit, throw an error, return?
+				}
 				writer.write(b);
 			}
 		}catch(Exception e) {
