@@ -65,10 +65,10 @@ public class Transfer implements Runnable {
 		try {
 			socket.setSoTimeout(DEFAULT_TIMEOUT);
 		}catch(SocketException e) {
-			errorMessage = "Problem ocurred setting timeout.";
+			String errorMessage = "Problem ocurred setting timeout.";
 			try {
 				sendError(0, errorMessage);
-			}catch(RuntimeException){}
+			}catch(RuntimeException e2){}
 			throw new RuntimeException(errorMessage);
 		}
 	}
@@ -141,7 +141,7 @@ public class Transfer implements Runnable {
 	 * @throws RuntimeException if there are any problem while trying to send error.
 	 */
 	private void sendError(int code, String message, TID id) throws RuntimeException {
-		try
+		try {
 			int length = Buffer.length(message) + 4;
 			Buffer buffer = new Buffer(length);
 			buffer.addShort(ERROR);
@@ -162,7 +162,7 @@ public class Transfer implements Runnable {
 	 * @throws Runtime if an error ocurred while reading or construct the buffer with next block.
 	 */
 	private Buffer nextBlock(FileBlocksReader reader) throws RuntimeException {
-		Buffer buffer;
+		Buffer buffer = new Buffer(516);
 		try {
 			buffer.addShort(DATA);
 			buffer.addShort(reader.nextIndex()+1); //add block number
@@ -176,7 +176,7 @@ public class Transfer implements Runnable {
 			throw new RuntimeException(errorMessage + e.getMessage());
 		}catch(Exception e) {
 			String errorMessage = "An error was produced when trying to construct "+
-				"the next block."
+				"the next block.";
 			sendError(0, errorMessage);
 			throw new RuntimeException(errorMessage + e.getMessage());
 		}
@@ -219,7 +219,7 @@ public class Transfer implements Runnable {
 				String errorMessage = "The connexion was closed due an error received: ";
 				try {
 					errorMessage += buffer.getString();
-				}catch(Exception) {}
+				}catch(Exception e) {}
 				throw new RuntimeException("errorMessage");
 			}else if(opcode >= 1 && opcode <= 5) {
 				sendError(UNDEFINED_ERROR, "Expected ACK but received "+opcode); //In this case error code is 0 or 4?
@@ -299,7 +299,7 @@ public class Transfer implements Runnable {
 				if(blockNumber == expected - 1) {
 					System.out.println("the latest has not reached"); //send the last block dispatched.
 				} else {
-					errorMessage = "unexpected block number, expected "+ 
+					String errorMessage = "unexpected block number, expected "+ 
 						expected +" but received "+ blockNumber;
 					sendError(UNDEFINED_ERROR, errorMessage);
 					throw new RuntimeException(errorMessage);
@@ -308,7 +308,7 @@ public class Transfer implements Runnable {
 				String errorMessage = "The connexion was closed due an error received: ";
 				try {
 					errorMessage += buffer.getString();
-				}catch(Exception) {}
+				}catch(Exception e) {}
 				throw new RuntimeException(errorMessage);
 			}else if(opcode >= 1 && opcode <= 5) {
 				String errorMessage = "Expected DATA but received "+opcode;
@@ -348,7 +348,7 @@ public class Transfer implements Runnable {
 			throw new RuntimeException(errorMessage + e.getMessage());
 		}catch(Exception e) {
 			String errorMessage = "An error was produced when trying to construct "+
-				"the buffer with next ack. "
+				"the buffer with next ack. ";
 			sendError(0, errorMessage);
 			throw new RuntimeException(errorMessage + e.getMessage());
 		}
