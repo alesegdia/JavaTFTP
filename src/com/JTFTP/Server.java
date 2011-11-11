@@ -40,12 +40,7 @@ public class Server {
 
 		DatagramPacket dataPacket = new DatagramPacket(tmpBuffer, BUFFER_SIZE);
 
-		try {
-			datagram.receive(dataPacket);
-		} catch (SocketTimeoutException ex) {
-			System.out.println("TIMEOUT!");
-		}
-
+		datagram.receive(dataPacket);
 		dataBuffer = new Buffer(dataPacket.getData());
 
 		int opcode = dataBuffer.getShort();
@@ -66,9 +61,8 @@ public class Server {
 				rw = Connection.WRITE;
 			}
 
-			Connection myConn = new Connection (new TID(dataPacket.getAddress(), dataPacket.getPort()), 
+			return new Connection (new TID(dataPacket.getAddress(), dataPacket.getPort()), 
 				rw, filename, mode);
-			return myConn;
 		}
 		// No valid connection, throw exception
 		return null;
