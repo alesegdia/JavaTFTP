@@ -1,13 +1,15 @@
-Functionality:
+Next improvements:
 
 *) Server: send files (started)
 *) Server: receive files (started)
 
-*) Client: send files
-*) Client: receive files
+*) Client: send files (started)
+*) Client: receive files (started)
 
 *) Implement timeouts and resend (started)
 *) Errors: capture, send and properly finish reporting the error. (started)
+
+*) Implement "ascii" mode. Is necessary to use Reader and Writer instead of InputStream and OutputStream?
 
 Test:
 
@@ -39,3 +41,7 @@ Future improvements:
 *) Implement TFTP extensions: see Timeout_TransferSize_Options.txt (rfc 1784) and Option_Extension.txt (rfc 1782). Transfer size option is equivalent to blocksize option of Blocksize_Option.txt (rfc 1783)?
 
 *) Divide big files in parts and send it separatelly?
+
+*) Internationalize the application, at least the error messages.
+
+*) Implement file log. Use Log4j?

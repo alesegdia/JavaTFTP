@@ -48,7 +48,7 @@ public class MainClass {
 	 */
 	public static void showHelp() {
 		System.out.println("JTFTP needs, in the order specified, the following arguments:");
-		System.out.println("-h|-s -p port_number|-c");
+		System.out.println("-h|-s -p port_number|-c -h host -p port_number (-r|-w) -f filename");
 	}
 
 	public static int getPort(String args[], int offset) throws Exception {
@@ -91,6 +91,32 @@ public class MainClass {
 	}
 
 	public static void createClient(String args[]) throws Exception {
-		throw new Exception("I do nothing");
+		throw new RuntimeException("Transfer is not prepared to be used as client.");
+		//parse arguments
+		if(args.length != 8) {
+			throw new RuntimeException("Incorrect number of arguments for server, use -h to see the correct format.");
+		}
+		if(!args[1].equalsIgnoreCase("-h")) {
+			throw new RuntimeException("Expected -h but received "+ args[1]);
+		}
+		InetAddress server = InetAddress.getByName(args[0]);
+
+		int port = getPort(args, 3);
+
+		if(!(args[5].equalsIgnoreCase("-r") || args[5].equalsIgnoreCase("-w"))) {
+			throw new RuntimeException("Expected -r or -w but received "+ args[5]);
+		}
+		boolean read = args[5].equalsIgnoreCase("-r");
+		
+		if(!args[6].equalsIgnoreCase("-f")) {
+			throw new RuntimeException("Expected -f but received "+ args[1]);
+		}
+
+		String filename = args[7];
+
+		Connection connection = new Connection(new TID(server, port), read, filename, "octet");
+		Transfer transfer = new Transfer(new DatagramSocket(0), connection);
+		Thread thread = new Thread(transfer);
+		thread.start();
 	}
 }

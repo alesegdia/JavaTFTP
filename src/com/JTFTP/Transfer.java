@@ -356,8 +356,9 @@ public class Transfer implements Runnable {
 
 	/**
 	 * Receive a file from a transfer id, all of this specified in clientConnection.
+	 * @throws RuntimeException if an error occurs.
 	 */
-	private void receiveFile() {
+	private void receiveFile() throws RuntimeExcetion {
 		FileBlocksWriter writer = null;
 		try {
 			writer = new FileBlocksWriter(clientConnection.getFileName(), true, 512); //overwrite file if exists
@@ -378,8 +379,9 @@ public class Transfer implements Runnable {
 					sendCounter++;
 				} while(sendCounter < maxSends);
 				if(b == null) {
-					sendError(UNDEFINED_ERROR, "Number of resends exceeded.");
-					//exit, throw an error, return?
+					errorMessage = "Number of resends exceeded.";
+					sendError(UNDEFINED_ERROR, errorMessage);
+					throw new RuntimeException(errorMessage);
 				}
 				writer.write(b);
 			}
